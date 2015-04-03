@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+//int 1=true -1=false
+clock t;
+
+chan Pdown_to_up,Pup_to_down,Ddown_to_up,Dup_to_down;
+
+int passenger1,passenger2,passenger3;
+int driver1,driver2,driver3;
+
+int endstop;
+int obstacle;
+
+int Pdown=3,Pup=3,Ddown=3,Dup=3,Edown=3;</declaration>
+	<template>
+		<name>Number</name>
+		<declaration>int count=0;</declaration>
+		<location id="id0" x="-144" y="-331">
+		</location>
+		<location id="id1" x="-144" y="-119">
+		</location>
+		<location id="id2" x="-408" y="-119">
+		</location>
+		<location id="id3" x="-408" y="-331">
+		</location>
+		<init ref="id3"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="assignment" x="-118" y="-361">count=count+1</label>
+			<nail x="-93" y="-331"/>
+			<nail x="-144" y="-391"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="assignment" x="-110" y="-136">count=count+1</label>
+			<nail x="-144" y="-51"/>
+			<nail x="-68" y="-119"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="assignment" x="-527" y="-102">count=count+1</label>
+			<nail x="-484" y="-119"/>
+			<nail x="-408" y="-51"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-323" y="-374">count&gt;=10</label>
+			<label kind="assignment" x="-323" y="-348">count=0</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-144" y="-259">count&gt;=10</label>
+			<label kind="assignment" x="-144" y="-238">count=0,
+passenger1=0,passenger2=0,passenger3=1,
+driver1=0,driver2=0,driver3=0,
+obstacle=0</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-357" y="-144">count&gt;=10</label>
+			<label kind="assignment" x="-390" y="-119">count=0,
+passenger1=0,passenger2=1,passenger3=0,
+driver1=0,driver2=0,driver3=1,
+obstacle=1</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="assignment" x="-552" y="-263">count=0,
+passenger1=0,passenger2=0,passenger3=1,
+driver1=0,driver2=1,driver3=0,
+obstacle=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Top</name>
+		<declaration>int Ttimer=0;</declaration>
+		<location id="id4" x="-646" y="17">
+			<name x="-680" y="25">emergencyDown</name>
+		</location>
+		<location id="id5" x="-646" y="-263">
+			<name x="-655" y="-246">safe</name>
+		</location>
+		<init ref="id5"/>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="assignment" x="-697" y="76">Ttimer=Ttimer+1</label>
+			<nail x="-714" y="76"/>
+			<nail x="-561" y="76"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-687" y="-348">obstacle==0</label>
+			<label kind="assignment" x="-680" y="-331">Edown=0</label>
+			<nail x="-705" y="-314"/>
+			<nail x="-586" y="-314"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-799" y="-136">Ttimer&gt;=10||
+endstop==1</label>
+			<label kind="assignment" x="-782" y="-161">Edown=0</label>
+			<nail x="-740" y="-110"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-595" y="-144">obstacle==1</label>
+			<label kind="assignment" x="-603" y="-119">Ttimer=0,Edown=1</label>
+			<nail x="-552" y="-102"/>
+		</transition>
+	</template>
+	<template>
+		<name>DriverTop</name>
+		<location id="id6" x="-527" y="76">
+			<committed/>
+		</location>
+		<location id="id7" x="-161" y="-263">
+			<name x="-171" y="-297">iniDriver</name>
+		</location>
+		<location id="id8" x="34" y="76">
+			<name x="24" y="42">driverUp</name>
+			<label kind="invariant" x="-8" y="93">Ddown==0&amp;&amp;Dup==1</label>
+		</location>
+		<location id="id9" x="-348" y="76">
+			<name x="-358" y="42">driverDown</name>
+			<label kind="invariant" x="-416" y="93">Ddown==1&amp;&amp;Dup==0</label>
+		</location>
+		<location id="id10" x="-161" y="-170">
+			<name x="-195" y="-153">driverNeutural</name>
+			<label kind="invariant" x="-212" y="-136">Ddown==0&amp;&amp;Dup==0</label>
+		</location>
+		<init ref="id7"/>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id10"/>
+			<label kind="assignment" x="-509" y="-170">Ddown=0,Dup=0</label>
+			<nail x="-527" y="-170"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-433" y="161">Edown==1</label>
+			<nail x="34" y="178"/>
+			<nail x="-527" y="178"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-493" y="59">Edown==1</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-161" y="-246">Edown==0</label>
+			<label kind="assignment" x="-161" y="-229">Ddown=0,Dup=0</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-111" y="-63">endstop==1||
+driver1==1</label>
+			<label kind="assignment" x="-68" y="-25">Dup=0</label>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-76" y="-102">driver2==1&amp;&amp;Edown==0</label>
+			<label kind="assignment" x="-8" y="-85">Dup=1</label>
+			<nail x="-8" y="-93"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-212" y="102">driver3==1</label>
+			<label kind="synchronisation" x="-203" y="119">Dup_to_down!</label>
+			<label kind="assignment" x="-221" y="136">Ddown=1,Dup=0</label>
+			<nail x="-154" y="106"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-212" y="42">driver2==1</label>
+			<label kind="synchronisation" x="-203" y="25">Ddown_to_up!</label>
+			<label kind="assignment" x="-203" y="59">Ddown=0,Dup=1</label>
+			<nail x="-153" y="42"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-288" y="-51">endstop==1||
+driver1==1</label>
+			<label kind="assignment" x="-280" y="-17">Ddown=0</label>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-416" y="-102">driver3==1&amp;&amp;Edown==0</label>
+			<label kind="assignment" x="-375" y="-76">Ddown=1</label>
+			<nail x="-315" y="-76"/>
+		</transition>
+	</template>
+	<template>
+		<name>DriverDown</name>
+		<declaration>clock DDtimer;</declaration>
+		<location id="id11" x="-340" y="103">
+			<committed/>
+		</location>
+		<location id="id12" x="42" y="103">
+			<name x="34" y="120">DriverDown</name>
+		</location>
+		<location id="id13" x="-162" y="103">
+			<name x="-187" y="120">autoDriverDown</name>
+		</location>
+		<location id="id14" x="-68" y="9">
+		</location>
+		<location id="id15" x="-68" y="-84">
+		</location>
+		<location id="id16" x="-68" y="-178">
+			<name x="-78" y="-212">iniDriverDown</name>
+		</location>
+		<init ref="id16"/>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-9" y="-135">Dup_to_down?</label>
+			<nail x="42" y="-178"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id16"/>
+			<nail x="-408" y="103"/>
+			<nail x="-408" y="-178"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-213" y="154">Ddown==0</label>
+			<nail x="0" y="179"/>
+			<nail x="-298" y="179"/>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-289" y="86">Ddown==0</label>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-221" y="-8">Ddown==0</label>
+			<nail x="-238" y="9"/>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-238" y="-110">Ddown==0</label>
+			<nail x="-264" y="-84"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id12"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="guard" x="-179" y="52">driver1==1</label>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-102" y="-42">DDtimer&gt;=200</label>
+		</transition>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id15"/>
+			<label kind="guard" x="-111" y="-152">Ddown==1</label>
+			<label kind="assignment" x="-110" y="-136">DDtimer=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>DriverUp</name>
+		<declaration>clock DUtimer;</declaration>
+		<location id="id17" x="-365" y="86">
+			<committed/>
+		</location>
+		<location id="id18" x="17" y="86">
+			<name x="17" y="102">DriverUp</name>
+		</location>
+		<location id="id19" x="-187" y="86">
+			<name x="-212" y="103">autoDriverUp</name>
+		</location>
+		<location id="id20" x="-93" y="-8">
+		</location>
+		<location id="id21" x="-93" y="-101">
+		</location>
+		<location id="id22" x="-93" y="-195">
+			<name x="-103" y="-229">iniDriverUp</name>
+		</location>
+		<init ref="id22"/>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="-34" y="-152">Ddown_to_up?</label>
+			<nail x="17" y="-195"/>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id22"/>
+			<nail x="-433" y="86"/>
+			<nail x="-433" y="-195"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-238" y="137">Dup==0</label>
+			<nail x="-25" y="162"/>
+			<nail x="-323" y="162"/>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-314" y="68">Dup==0</label>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-246" y="-25">Dup==0</label>
+			<nail x="-263" y="-8"/>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-263" y="-127">Dup==0</label>
+			<nail x="-289" y="-101"/>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id18"/>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id19"/>
+			<label kind="guard" x="-204" y="35">driver1==1</label>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id20"/>
+			<label kind="guard" x="-127" y="-59">DUtimer&gt;=200</label>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id21"/>
+			<label kind="guard" x="-127" y="-169">Dup==1</label>
+			<label kind="assignment" x="-127" y="-152">DUtimer=0</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">PassengerTop</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id23" x="-102" y="-221">
+			<name x="-112" y="-255">iniPassenger</name>
+		</location>
+		<location id="id24" x="-501" y="102">
+			<committed/>
+		</location>
+		<location id="id25" x="93" y="102">
+			<name x="83" y="68">passengerUp</name>
+			<label kind="invariant" x="51" y="119">Pdown==0&amp;&amp;Pup==1&amp;&amp;
+Ddown==0&amp;&amp;Dup==0</label>
+		</location>
+		<location id="id26" x="-289" y="102">
+			<name x="-299" y="68">passengerDown</name>
+			<label kind="invariant" x="-357" y="119">Pdown==1&amp;&amp;Pup==0&amp;&amp;
+Ddown==0&amp;&amp;Dup==0</label>
+		</location>
+		<location id="id27" x="-102" y="-144">
+			<name x="-161" y="-93">passengerNeutural</name>
+			<label kind="invariant" x="-161" y="-127">Pdown==0&amp;&amp;Pup==0&amp;&amp;
+Ddown==0&amp;&amp;Dup==0</label>
+		</location>
+		<init ref="id23"/>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id27"/>
+			<label kind="assignment" x="-483" y="-144">Pdown=0,Pup=0</label>
+			<nail x="-501" y="-144"/>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id27"/>
+			<label kind="guard" x="-102" y="-204">Ddown==0&amp;&amp;Dup==0</label>
+			<label kind="assignment" x="-93" y="-187">Pdown=0,Pup=0</label>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id24"/>
+			<label kind="guard" x="-459" y="204">Ddown==1||Dup==1</label>
+			<nail x="93" y="230"/>
+			<nail x="-501" y="230"/>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id24"/>
+			<label kind="guard" x="-484" y="77">Ddown==1||Dup==1</label>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id27"/>
+			<label kind="guard" x="-52" y="-37">endstop==1||
+passenger1==1</label>
+			<label kind="assignment" x="-9" y="1">Pup=0</label>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id25"/>
+			<label kind="guard" x="-25" y="-102">passenger2==1&amp;&amp;
+Ddown==0&amp;&amp;Dup==0</label>
+			<label kind="assignment" x="51" y="-51">Pup=1</label>
+			<nail x="51" y="-59"/>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="guard" x="-153" y="128">passenger3==1</label>
+			<label kind="synchronisation" x="-144" y="145">Pup_to_down!</label>
+			<label kind="assignment" x="-144" y="161">Pdown=1,Pup=0</label>
+			<nail x="-95" y="132"/>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id25"/>
+			<label kind="guard" x="-153" y="68">passenger2==1</label>
+			<label kind="synchronisation" x="-144" y="51">Pdown_to_up!</label>
+			<label kind="assignment" x="-144" y="85">Pdown=0,Pup=1</label>
+			<nail x="-94" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id27"/>
+			<label kind="guard" x="-229" y="-25">endstop==1||
+passenger1==1</label>
+			<label kind="assignment" x="-221" y="9">Pdown=0</label>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id26"/>
+			<label kind="guard" x="-331" y="-85">passenger3==1&amp;&amp;
+Ddown==0&amp;&amp;Dup==0</label>
+			<label kind="assignment" x="-314" y="-34">Pdown=1</label>
+			<nail x="-255" y="-51"/>
+		</transition>
+	</template>
+	<template>
+		<name>PassengerDown</name>
+		<declaration>clock PDtimer;</declaration>
+		<location id="id28" x="-484" y="-93">
+			<committed/>
+		</location>
+		<location id="id29" x="-102" y="-93">
+			<name x="-110" y="-76">PassengerDown</name>
+		</location>
+		<location id="id30" x="-306" y="-93">
+			<name x="-331" y="-76">autoPassengerDown</name>
+		</location>
+		<location id="id31" x="-212" y="-187">
+		</location>
+		<location id="id32" x="-213" y="-280">
+		</location>
+		<location id="id33" x="-212" y="-374">
+			<name x="-222" y="-408">iniPassengerDown</name>
+		</location>
+		<init ref="id33"/>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-153" y="-331">Pup_to_down?</label>
+			<nail x="-102" y="-374"/>
+		</transition>
+		<transition>
+			<source ref="id28"/>
+			<target ref="id33"/>
+			<nail x="-552" y="-93"/>
+			<nail x="-552" y="-374"/>
+		</transition>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id28"/>
+			<label kind="guard" x="-357" y="-42">Pdown==0</label>
+			<nail x="-144" y="-17"/>
+			<nail x="-442" y="-17"/>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id28"/>
+			<label kind="guard" x="-433" y="-110">Pdown==0</label>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id28"/>
+			<label kind="guard" x="-365" y="-204">Pdown==0</label>
+			<nail x="-382" y="-187"/>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id28"/>
+			<label kind="guard" x="-382" y="-306">Pdown==0</label>
+			<nail x="-408" y="-280"/>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id29"/>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id30"/>
+			<label kind="guard" x="-323" y="-144">passenger1==1</label>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id31"/>
+			<label kind="guard" x="-246" y="-238">PDtimer&gt;=200</label>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id32"/>
+			<label kind="guard" x="-255" y="-348">Pdown==1</label>
+			<label kind="assignment" x="-246" y="-331">PDtimer=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>PassengerUp</name>
+		<declaration>clock PUtimer;</declaration>
+		<location id="id34" x="-170" y="94">
+			<committed/>
+		</location>
+		<location id="id35" x="212" y="94">
+			<name x="212" y="110">PassengerUp</name>
+		</location>
+		<location id="id36" x="8" y="94">
+			<name x="-17" y="111">autoPassengerUp</name>
+		</location>
+		<location id="id37" x="102" y="0">
+		</location>
+		<location id="id38" x="102" y="-93">
+		</location>
+		<location id="id39" x="102" y="-187">
+			<name x="92" y="-221">iniPassengerUp</name>
+		</location>
+		<init ref="id39"/>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="161" y="-144">Pdown_to_up?</label>
+			<nail x="212" y="-187"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id39"/>
+			<nail x="-238" y="94"/>
+			<nail x="-238" y="-187"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id34"/>
+			<label kind="guard" x="-43" y="145">Pup==0</label>
+			<nail x="170" y="170"/>
+			<nail x="-128" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id34"/>
+			<label kind="guard" x="-119" y="76">Pup==0</label>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id34"/>
+			<label kind="guard" x="-51" y="-17">Pup==0</label>
+			<nail x="-68" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id34"/>
+			<label kind="guard" x="-68" y="-119">Pup==0</label>
+			<nail x="-94" y="-93"/>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id35"/>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id36"/>
+			<label kind="guard" x="-9" y="43">passenger1==1</label>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id37"/>
+			<label kind="guard" x="68" y="-51">PUtimer&gt;=200</label>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id38"/>
+			<label kind="guard" x="68" y="-161">Pup==1</label>
+			<label kind="assignment" x="68" y="-144">PUtimer=0</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+PT=PassengerTop();
+PD=PassengerDown();
+PU=PassengerUp();
+
+DT=DriverTop();
+DD=DriverDown();
+DU=DriverUp();
+
+TOP=Top();
+NUM=Number();
+// List one or more processes to be composed into a system.
+system NUM,TOP,DT,DD,DU,PT,PD,PU;
+
+    </system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock
+			</formula>
+			<comment>
+			</comment>
+		</query>
+	</queries>
+</nta>
